@@ -163,7 +163,7 @@ Communities in a graph via random walks. The idea is that short random walks ten
 
 * label propagation communities:
 
-An effective method for community detection in large-scale complex networks.
+An effective method for community detection in large-scale complex networks. Label propagation is an extremely fast algorithm with near linear time complexity and it is applicable to large-scale networks. In spite of the advantages of label propagation, the issue of the robustness of the algorithm has not yet been properly addressed. Random node updating orders may result in totally different network partitions and even unreasonable community structures.
 
 It works by labeling the vertices with unique labels and then updating the labels by majority voting in the neighborhood of the vertex.
 
