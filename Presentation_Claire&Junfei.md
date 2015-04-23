@@ -1,21 +1,26 @@
 ---
-author: "Yang Liu(yl3296)" "Junfei Shen(js4567)"
-title: "Final Project Presentation - topic modeling with LDA and visualization"
-date: "Thursday, April 23, 2015"
+title: Final Project Presentation - Topic modeling with LDA and visualization
+author: Yang Liu(yl3296), Junfei Shen(js4567)
+date: Thursday, April 23, 2015
 layout: post
 output: md
-description: Final Project
-tags: topic modeling, wordcloud, shiny, yelp
+tags: yelp reviews, topic modeling, wordcloud, shiny, network, gephi
 ---
 
+
 ##1. Introduction
---------
-We focus on customer reviews for restaurants， applying topic modeling on reviews data.
+We focus on customer reviews for restaurants，applying LDA on reviews data.
+
 **Topic model:**
 * Unsupervised machine learning based on text data
 * One of the most useful algorithm__LDA
 
-##2. Prepare data
+**LDA:**
+* A collection of distributions on words (topics).
+* A distribution on topics for each document(star).
+
+
+##2. Data Preparation
 **Our datasets:**
 * yelp_academic_dataset_business.json
 * yelp_academic_dataset_reviews.json
@@ -48,6 +53,7 @@ for json_filename in glob('*.json'):
     df.to_csv(csv_filename, encoding='utf-8', index=False)
 
 ```
+
 * Read in R and data preprocessing:
 
 ```
@@ -78,9 +84,9 @@ cat("Testing set: "); print(dim(data_review_restaurant.test))
   Words in each topic are ordered by decreasing order by frequency.
   
 ```
-
+[<img src="https://github.com/shenjunfei/DV_NYDine/blob/master/fig/map3.png">](http://rpubs.com/shenjunfei/74959)
 ##3. LDA
-**Split the dataset into training data and testing data, get the top 30 topic:**
+**Split the dataset into training data and testing data, get the top 30 topics:**
 ```
 import os
 import re
@@ -95,9 +101,8 @@ stoplist = set('came way dad yes try oh phoenix one two three four th alot well 
 # LDA, k number of topics
 k = 30
 
-# If LDA model doesn't exist already...
+# Training LDA...
 if not os.path.isfile('LDA/lda_model'):
-    # Do everything
     print "Generating LDA model..."
     if not os.path.exists('LDA'):
         os.mkdir('LDA')
@@ -105,11 +110,8 @@ if not os.path.isfile('LDA/lda_model'):
     for review in data_review_restaurant_train:
         # Only care about documents of certain length
         if (len(review) > 100):
-            # Remove punctuations
             review = re.sub(r'[^a-zA-Z]', ' ', review)
-            # To lowercase
             review = review.lower()
-            # Remove stop words
             texts = [word for word in review.lower().split() if word not in stoplist]
             try:
                 corpus.append(texts)
@@ -154,37 +156,16 @@ else:
 ```
 
 * Top 30 topics:
+```
 Topic 1: beer, selection, beers, tap, local, draft, cold, bar, ale, pies
 Topic 2: location, times, years, new, still, since, few, last, used, time
 Topic 3: chicken, sauce, fried, pork, rice, beef, flavor, meat, bbq, shrimp
 Topic 4: oil, fork, olive, feta, grease, children, flatbread, mon, karaoke, black
 Topic 5: pho, spring, vietnamese, rolls, vegas, san, broth, mi, best, bowl
-Topic 6: thai, soup, chinese, tea, curry, noodles, spicy, rice, dishes, dish
-Topic 7: coffee, brunch, sunday, hash, morning, french, cafe, bagel, bloody, breakfast
-Topic 8: breakfast, eggs, bacon, toast, pancakes, egg, potatoes, gravy, french, sausage
-Topic 9: steak, ordered, dinner, meal, service, delicious, dessert, dish, cooked, lobster
-Topic 10: wall, hole, store, consistently, und, grocery, das, der, ich, mahi
-Topic 11: pizza, italian, crust, cheese, sauce, pasta, pizzas, pie, slice, thin
-Topic 12: sushi, roll, rolls, fish, tuna, fresh, salmon, sashimi, chef, ayce
-Topic 13: bar, wine, night, drinks, bartender, drink, glass, happy, dinner, bottle
-Topic 14: time, service, order, minutes, ordered, table, asked, took, server, wait
-Topic 15: old, school, something, high, madison, feel, head, express, off, life
-Topic 16: de, la, le, et, un, est, pour, les, en, une
-Topic 17: es, j, avec, h, killer, ed, caf, id, tait, el
-Topic 18: buffet, better, price, vegas, pretty, eat, bad, nothing, quality, worth
-Topic 19: tacos, mexican, chips, salsa, taco, burrito, beans, fish, carne, guacamole
-Topic 20: yelp, margarita, photos, nachos, quesadilla, select, yum, def, rocks, biz
-Topic 21: bar, night, people, pretty, outside, area, patio, music, little, inside
-Topic 22: strip, hotel, shop, mall, casino, dollar, located, vegas, pittsburgh, resort
-Topic 23: service, love, best, friendly, time, staff, amazing, delicious, definitely, recommend
-Topic 24: menu, options, find, items, friendly, vegetarian, quite, area, priced, vegan
-Topic 25: salad, chicken, lunch, bread, fresh, delicious, soup, sandwich, ordered, side
-Topic 26: burger, fries, sandwich, cheese, burgers, sandwiches, potato, bacon, ordered, onion
-Topic 27: hot, wings, dog, chicken, korean, dogs, sauce, spicy, hawaiian, buffalo
-Topic 28: cream, ice, chocolate, dessert, cake, indian, sweet, desserts, banana, delicious
-Topic 29: die, pub, irish, ist, man, dancing, site, pollo, hooters, definately
-Topic 30: experience, review, reviews, owner, yelp, party, business, birthday, card, manager
-    
+...
+...
+```
+
 **Get topic proportion for every star**
 
 ```
@@ -224,21 +205,44 @@ def generate_topic_dist_matrix(corpus, all_dist, star):
         all_dist.append(temp)
         topic_dist[highest_topic] += 1
     return topic_dist, all_dist
- ```
+    
+ # Process the reviews
+corpus_5stars = process_reviews(train_5stars)
+corpus_4stars = process_reviews(train_4stars)
+corpus_3stars = process_reviews(train_3stars)
+corpus_2stars = process_reviews(train_2stars)
+corpus_1stars = process_reviews(train_1stars)
+
+# Apply testing set to model
+# Build an list of list to store topic distribution, will convert to dataframe later
+topic_dist_list = []
+
+# Keep a separate list to count topics
+topic_dist_5stars = []
+topic_dist_4stars = []
+topic_dist_3stars = []
+topic_dist_2stars = []
+topic_dist_1stars = []
+
+topic_dist_5stars, topic_dist_list = generate_topic_dist_matrix(corpus_5stars, topic_dist_list, 5)
+topic_dist_4stars, topic_dist_list = generate_topic_dist_matrix(corpus_4stars, topic_dist_list, 4)
+topic_dist_3stars, topic_dist_list = generate_topic_dist_matrix(corpus_3stars, topic_dist_list, 3)
+topic_dist_2stars, topic_dist_list = generate_topic_dist_matrix(corpus_2stars, topic_dist_list, 2)
+topic_dist_1stars, topic_dist_list = generate_topic_dist_matrix(corpus_1stars, topic_dist_list, 1)
+
+```
  
 * Topic proportion for star one to star five:
 ```
 Topic distribution for 5-star reviews in test set:  [97, 1056, 1601, 10, 96, 812, 181, 378, 5113, 3, 1185, 307, 338, 2200, 108, 154, 5, 1803, 957, 13, 1808, 15, 11597, 1155, 2017, 1887, 146, 347, 64, 399]
 Topic distribution for 4-star reviews in test set:  [95, 1176, 2389, 7, 119, 1168, 145, 455, 3967, 2, 1113, 339, 387, 3313, 109, 220, 6, 3197, 987, 13, 3636, 13, 6485, 1432, 2654, 2543, 130, 234, 72, 277]
-Topic distribution for 3-star reviews in test set:  [77, 1421, 2805, 8, 96, 976, 92, 384, 2670, 1, 880, 237, 249, 6736, 93, 217, 6, 7412, 776, 20, 3785, 10, 2600, 1052, 1651, 2559, 89, 125, 93, 253]
-Topic distribution for 2-star reviews in test set:  [39, 1441, 2801, 13, 56, 631, 39, 212, 1810, 0, 796, 224, 138, 13362, 111, 138, 1, 8666, 603, 5, 1802, 4, 1037, 448, 940, 1852, 60, 67, 76, 316]
-Topic distribution for 1-star reviews in test set:  [21, 1294, 1779, 35, 26, 329, 20, 143, 693, 2, 621, 114, 90, 21319, 92, 105, 5, 6071, 381, 0, 903, 9, 477, 197, 445, 975, 37, 36, 59, 892]
+...
 ```
 
 **Visualize topic proportion for every star by shiny:**
 ![wordcloud](https://cloud.githubusercontent.com/assets/10662777/7301460/c37b118e-e9b0-11e4-9d67-8a95394cb60e.png)
 
-#####[To wordcloud shinyapps]: (https://claire-yl3296-presentation.shinyapps.io/wordcloud/)
+#####[To wordcloud shinyapps](https://claire-yl3296-presentation.shinyapps.io/wordcloud/)
 * Given each star, we can clearly see the key words.
 * Interative: Star, Minimum frequency and Maximum Number of Words can be customized.
 * Nice way to visualize text mining.
@@ -324,5 +328,13 @@ fluidPage(
 )
 
 ```
+![dist](https://github.com/shenjunfei/DV_NYDine/blob/master/fig/dist.png)
+![bar1](https://github.com/shenjunfei/DV_NYDine/blob/master/fig/bar1.png)
+![bar2](https://github.com/shenjunfei/DV_NYDine/blob/master/fig/bar2.png)
+![bar3](https://github.com/shenjunfei/DV_NYDine/blob/master/fig/bar3.png)
+![bar4](https://github.com/shenjunfei/DV_NYDine/blob/master/fig/bar4.png)
+![bar5](https://github.com/shenjunfei/DV_NYDine/blob/master/fig/bar5.png)
+
 **Visualize network:**
+![network](https://github.com/shenjunfei/DV_NYDine/blob/master/fig/net2.png)
 
