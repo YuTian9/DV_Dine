@@ -1,13 +1,11 @@
-
 ---
-
 title: "Final Project Presentation - network and clustering"
 author: "Yu Tian"
 date: "Thursday, April 23, 2015"
 output: html_document
 layout: post
 description: Final Project
-
+tags: network, clustering, yelp
 ---
 
 
@@ -165,9 +163,9 @@ Communities in a graph via random walks. The idea is that short random walks ten
 
 * label propagation communities:
 
-An effective method for community detection in large-scale complex networks.
+An effective method for community detection in large-scale complex networks. Label propagation is an extremely fast algorithm with near linear time complexity and it is applicable to large-scale networks. In spite of the advantages of label propagation, the issue of the robustness of the algorithm has not yet been properly addressed. Random node updating orders may result in totally different network partitions and even unreasonable community structures.
 
-IT works by labeling the vertices with unique labels and then updating the labels by majority voting in the neighborhood of the vertex.
+It works by labeling the vertices with unique labels and then updating the labels by majority voting in the neighborhood of the vertex.
 
     lp=label.propagation.community(adj_mtx_g) ##runlabelpropogationpartitioning 
     plot(lp,adj_mtx_g) ##plotL-Ppartitioning
@@ -285,7 +283,7 @@ R [script](https://github.com/YuTian9/DV_NYDine/blob/master/scripts/hierarchical
 
 ### 2.1.1 Features describe a business
 
-* categories:
+* attributes:
 
     u'Drive-Thru', u'Alcohol', u'Noise Level', u'Music', u'Has TV', u'Attire', u'Ambience', u'Good for Kids', 
     u'Price Range', u'BYOB', u'Good For Dancing', u'Delivery', u'Coat Check', u'Smoking', u'Accepts Credit Cards', 
@@ -293,7 +291,7 @@ R [script](https://github.com/YuTian9/DV_NYDine/blob/master/scripts/hierarchical
     u'Takes Reservations', u'Waiter Service', u'Wi-Fi', u'Caters', u'Order at Counter', u'Good For', u'Parking', 
     u'By Appointment Only', u'Good For Kids', u'Good For Groups'
 
-* attributes:
+* categories:
 
     u'Hardware Stores', u'American (New)', u'Coffee & Tea', u'Knitting Supplies', u'Breweries', u'Trainers', 
     u'Breakfast & Brunch', u'Orthodontists', u'Transportation', u'Fast Food', u'Building Supplies', 
@@ -356,6 +354,8 @@ Do it in R, use "pvclust" package:
 
 
  It provides AU (approximately unbiased) p-value as well as. BP (bootstrap probability) 
+ 
+"pvclust" provides two types of p-values: AU (Approximately Unbiased) p-value and BP (Bootstrap Probability) value. AU p-value, which is computed by multiscale bootstrap resampling, is a better approximation to unbiased p-value than BP value computed by normal bootstrap resampling. Clusters with AU larger than 95% are highlighted by rectangles, which are strongly supported by data.
 
 <img src="https://raw.githubusercontent.com/YuTian9/DV_NYDine/master/fig/clustering_bootstrap.png" width="1800" height="400">
 

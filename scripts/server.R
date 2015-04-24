@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 shinyServer(function(input, output,session) {
   formulaText<-reactive({
     paste("Stars",input$Stars, input$Factors)
@@ -87,6 +88,14 @@ shinyServer(function(input, output,session) {
     print(s1)}) 
   
   
+=======
+'__author__' = 'Yang Liu(yl3296)'
+
+##Shiny apps showing restaurant reviews on top 30 topics.
+
+function(input, output, session) {
+  # Define a reactive expression for the document term matrix
+>>>>>>> 32a5bdeb132f9df5691075cc085d8d67327bfcfc
   terms <- reactive({
     # Change when the "update" button is pressed...
     input$update
@@ -108,8 +117,12 @@ shinyServer(function(input, output,session) {
                   min.freq = input$freq, max.words=input$max,
                   colors=brewer.pal(8, "Dark2"))
   })
+<<<<<<< HEAD
   
   
   
 })
 
+=======
+}
+>>>>>>> 32a5bdeb132f9df5691075cc085d8d67327bfcfc

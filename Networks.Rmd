@@ -74,13 +74,20 @@ hist(attrb$fans, main="Distribution of number of fans",xlab="number of fans" )
 To understand the structure of the whole network, we apply different coummity partitioning base on different criteria.
 ```{r community}
 eb <- edge.betweenness.community (adj_mtx_g, directed = F, edge.betweenness = TRUE, merges = TRUE,bridges=TRUE,modularity=TRUE,membership=TRUE) 
-plot(eb,adj_mtx_g)
+plot(eb,adj_mtx_g,layout=layout.fruchterman.reingold)
+eb$membership
 
-wt<-walktrap.community(adj_mtx_g,steps=200,modularity=TRUE)#,labels=TRUE) ##run random walk partitioning
-plot(wt,adj_mtx_g) ##plotR-Wpartitioning 
+wt<-walktrap.community(adj_mtx_g,steps=200,modularity=TRUE) ##run random walk partitioning
+plot(wt,adj_mtx_g,layout=layout.spring) ##plotR-Wpartitioning 
+wt$membership
 
 lp=label.propagation.community(adj_mtx_g) ##runlabelpropogationpartitioning 
-plot(lp,adj_mtx_g) ##plotL-Ppartitioning
+plot(lp,adj_mtx_g,layout=layout.spring) ##plotL-Ppartitioning
+lp$membership
+
+plot(g,layout=layout.reingold.tilford)
+plot(g,layout=layout.fruchterman.reingold)
+plot(g, layout=layout.spring)
 
 ## compare these methods to each other
 compare(eb, wt, method= c("nmi")) 
@@ -294,6 +301,5 @@ plot(g,layout=layout.sphere)
 plot(g,layout=layout.reingold.tilford)
 plot(g,layout=layout.fruchterman.reingold)
 plot(g, layout=layout.spring)
-tkplot(g)
 ```
 
